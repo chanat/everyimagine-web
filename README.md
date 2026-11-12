@@ -101,7 +101,6 @@ src/views/              เนื้อหาของแต่ละหน้�
 src/legal/              ข้อความ Privacy Policy ฉบับกลางและ Terms (EN/TH) + วันที่ปรับปรุงล่าสุดใน meta.ts
 src/pages/              ไฟล์ route บางๆ ที่เรียก view
 wrangler.jsonc          ค่าตั้ง Cloudflare (ให้เสิร์ฟไฟล์ใน dist/)
-.node-version           เวอร์ชัน Node ที่ Cloudflare ใช้ build
 ```
 
 ## Deploy บน Cloudflare (ทำครั้งแรก)
@@ -119,8 +118,10 @@ wrangler.jsonc          ค่าตั้ง Cloudflare (ให้เสิร�
    | Deploy command | `npx wrangler deploy` |
    | Root directory | `/` (ค่าเริ่มต้น) |
 
-   เวอร์ชัน Node ถูกกำหนดไว้ในไฟล์ `.node-version` แล้ว (Astro 7 ต้องการ 22.23.4 ขึ้นไป)
-   ถ้า build ฟ้องเรื่องเวอร์ชัน Node ให้เพิ่มตัวแปร `NODE_VERSION` = `24.22.3` ใน Settings → Build → Variables
+   ไม่ต้องกำหนดเวอร์ชัน Node: ค่าเริ่มต้นของ Cloudflare (24.22.1 ณ พ.ย. 2026) ใหม่พอสำหรับ Astro 7
+   ซึ่งต้องการ 22.23.4 ขึ้นไป อย่าใส่ไฟล์ `.node-version` ที่ระบุรุ่นซึ่งเพิ่งออกใหม่
+   เพราะเครื่อง build ติดตั้งรุ่นที่ไม่มีมาให้ล่วงหน้าไม่สำเร็จ (เคยล้มเหลวกับ 24.22.3)
+   ถ้าวันหนึ่งต้องกำหนดเอง ให้ใช้ตัวแปร `NODE_VERSION` ใน Settings → Build → Variables
    หลังจากนี้ทุกครั้งที่ push ขึ้น `main` Cloudflare จะ build และ deploy ให้เอง
 
    (อีกทางคือ deploy จากเครื่องด้วย `npm run deploy` ซึ่ง wrangler จะให้ล็อกอินครั้งแรก)
