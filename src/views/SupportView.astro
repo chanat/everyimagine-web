@@ -1,0 +1,279 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { apps } from '../data/apps';
+import { type Lang, href, SUPPORT_EMAIL } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const c = {
+  en: {
+    title: 'Support',
+    description: 'Get help with EveryImagine apps and games. Email us and we will reply.',
+    eyebrow: 'Support',
+    h1: 'How can we help?',
+    lead: 'Having trouble with one of our apps or games, or have an idea to share? Email us and we will reply.',
+    cardTitle: 'Email us',
+    cardBody: 'We read every message. Write in English or Thai.',
+    cta: 'Write an email',
+    copy: 'Copy address',
+    copied: 'Copied',
+    subject: 'Support request',
+    includeTitle: 'To help us help you, please include',
+    include: [
+      'The app or game you are writing about',
+      'Your device and system version, for example iPhone 15, iOS 18.1',
+      'What happened, and what you expected to happen',
+      'A screenshot, if it helps',
+    ],
+    privacy: 'We use what you send only to answer you. See our',
+    privacyLink: 'Privacy Policy',
+    tipsTitle: 'Before you write',
+    tips: [
+      { q: 'A purchase is missing', a: 'Open the app’s shop and tap “Restore purchases” while signed in to the store account you bought with.' },
+      { q: 'You want a refund', a: 'Refunds are handled by Apple or Google. Request one from your App Store or Google Play purchase history.' },
+      { q: 'Something looks broken', a: 'Update to the latest version first. If it still happens, tell us your device and what you tapped.' },
+    ],
+  },
+  th: {
+    title: 'ช่วยเหลือ',
+    description: 'ขอความช่วยเหลือเกี่ยวกับแอพและเกมของ EveryImagine ส่งอีเมลหาเรา แล้วเราจะตอบกลับ',
+    eyebrow: 'ช่วยเหลือ',
+    h1: 'ให้เราช่วยอะไรดี?',
+    lead: 'ใช้แอพหรือเกมของเราแล้วติดปัญหา หรือมีไอเดียอยากบอก ส่งอีเมลหาเราได้เลย เราจะตอบกลับ',
+    cardTitle: 'ส่งอีเมลหาเรา',
+    cardBody: 'เราอ่านทุกข้อความ เขียนเป็นภาษาไทยหรืออังกฤษก็ได้',
+    cta: 'เขียนอีเมล',
+    copy: 'คัดลอกอีเมล',
+    copied: 'คัดลอกแล้ว',
+    subject: 'ขอความช่วยเหลือ',
+    includeTitle: 'เพื่อให้เราช่วยได้เร็ว โปรดบอก',
+    include: [
+      'แอพหรือเกมที่คุณเขียนถึง',
+      'รุ่นอุปกรณ์และเวอร์ชันระบบ เช่น iPhone 15, iOS 18.1',
+      'เกิดอะไรขึ้น และคุณคาดว่าควรเป็นอย่างไร',
+      'ภาพหน้าจอ ถ้าช่วยให้เข้าใจง่ายขึ้น',
+    ],
+    privacy: 'เราใช้ข้อมูลที่คุณส่งมาเพื่อตอบกลับคุณเท่านั้น ดู',
+    privacyLink: 'นโยบายความเป็นส่วนตัว',
+    tipsTitle: 'ก่อนส่งอีเมล',
+    tips: [
+      { q: 'รายการที่ซื้อหายไป', a: 'เปิดร้านค้าในแอพ แล้วแตะ “กู้คืนการซื้อ” โดยล็อกอินบัญชีร้านค้าเดียวกับที่ใช้ซื้อ' },
+      { q: 'ต้องการขอเงินคืน', a: 'การคืนเงินดำเนินการโดย Apple หรือ Google ส่งคำขอได้จากประวัติการซื้อใน App Store หรือ Google Play' },
+      { q: 'แอพทำงานผิดปกติ', a: 'อัปเดตเป็นเวอร์ชันล่าสุดก่อน หากยังเป็นอยู่ บอกรุ่นอุปกรณ์และขั้นตอนที่กดให้เราทราบ' },
+    ],
+  },
+}[lang];
+
+const mailto = `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(c.subject)}`;
+// name of each app by slug, so a visit from an app page (/support?app=morningcam) can prefill the subject
+const appNames = Object.fromEntries(apps.map((a) => [a.slug, a.name]));
+---
+
+<Base lang={lang} path="/support" title={c.title} description={c.description}>
+  <div class="support wrap">
+    <header class="support__head">
+      <p class="eyebrow">{c.eyebrow}</p>
+      <h1>{c.h1}</h1>
+      <p class="lead">{c.lead}</p>
+    </header>
+
+    <div class="support__grid">
+      <section class="card mail">
+        <span class="mail__icon"><Icon name="mail" size={28} /></span>
+        <h2>{c.cardTitle}</h2>
+        <p class="mail__body">{c.cardBody}</p>
+        <a class="mail__address" id="support-address" href={mailto}>{SUPPORT_EMAIL}</a>
+        <div class="mail__actions">
+          <a class="btn btn--primary" id="support-mailto" href={mailto}>{c.cta} <Icon name="arrow" size={18} /></a>
+          <button class="btn btn--ghost" id="support-copy" type="button" data-copy={c.copy} data-copied={c.copied} hidden>
+            {c.copy}
+          </button>
+        </div>
+
+        <h3>{c.includeTitle}</h3>
+        <ul class="ticks">
+          {
+            c.include.map((item) => (
+              <li>
+                <Icon name="check" size={20} />
+                <span>{item}</span>
+              </li>
+            ))
+          }
+        </ul>
+        <p class="mail__privacy">
+          {c.privacy} <a href={href(lang, '/privacy')}>{c.privacyLink}</a>.
+        </p>
+      </section>
+
+      <aside class="support__aside">
+        <h2>{c.tipsTitle}</h2>
+        <dl class="tips">
+          {
+            c.tips.map((tip) => (
+              <div>
+                <dt>{tip.q}</dt>
+                <dd>{tip.a}</dd>
+              </div>
+            ))
+          }
+        </dl>
+      </aside>
+    </div>
+  </div>
+
+  <!-- is:inline so it runs again when the language switcher swaps this page in -->
+  <script is:inline define:vars={{ email: SUPPORT_EMAIL, subject: c.subject, appNames }}>
+    (() => {
+      // Arriving from an app page (/support?app=morningcam): put the app's name in the subject.
+      const app = appNames[new URLSearchParams(location.search).get('app') ?? ''];
+      if (app) {
+        const url = `mailto:${email}?subject=${encodeURIComponent(`[${app}] ${subject}`)}`;
+        for (const id of ['support-mailto', 'support-address']) document.getElementById(id)?.setAttribute('href', url);
+      }
+
+      // "Copy address" for people whose browser has no mail app set up.
+      const copy = document.getElementById('support-copy');
+      if (copy && navigator.clipboard) {
+        copy.hidden = false;
+        copy.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(email);
+            copy.textContent = copy.dataset.copied;
+            setTimeout(() => (copy.textContent = copy.dataset.copy), 1800);
+          } catch {
+            /* clipboard blocked: the address is on screen to select by hand */
+          }
+        });
+      }
+    })();
+  </script>
+</Base>
+
+<style>
+  .support {
+    padding-top: clamp(40px, 7vw, 80px);
+  }
+  .support__head {
+    max-width: 40em;
+  }
+  .support__head h1 {
+    margin-top: 14px;
+    font-size: clamp(2.4rem, 6vw, 4rem);
+    font-weight: 800;
+  }
+  .support__head .lead {
+    margin-top: 16px;
+  }
+  .support__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
+    gap: clamp(28px, 5vw, 64px);
+    align-items: start;
+    margin-top: clamp(32px, 5vw, 56px);
+  }
+
+  .mail {
+    padding: clamp(24px, 4vw, 48px);
+  }
+  .mail__icon {
+    display: grid;
+    place-items: center;
+    width: 60px;
+    height: 60px;
+    border-radius: 18px;
+    background: var(--spark);
+    color: #fff;
+  }
+  .mail h2 {
+    margin-top: 22px;
+    font-size: clamp(1.5rem, 3vw, 2rem);
+  }
+  .mail__body {
+    margin-top: 8px;
+    color: var(--ink-2);
+  }
+  .mail__address {
+    display: inline-block;
+    margin-top: 20px;
+    font-family: var(--font-display);
+    font-size: clamp(1.4rem, 3.6vw, 2.2rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+    color: var(--ink);
+    text-decoration-color: var(--yellow);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 6px;
+    overflow-wrap: anywhere;
+  }
+  .mail__address:hover {
+    color: var(--link);
+  }
+  .mail__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 26px;
+  }
+  .mail h3 {
+    margin-top: clamp(32px, 4vw, 44px);
+    padding-top: clamp(24px, 3vw, 32px);
+    border-top: 1px solid var(--line);
+    font-size: 1.15rem;
+    letter-spacing: -0.01em;
+  }
+  .ticks {
+    display: grid;
+    gap: 10px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ticks li {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: 12px;
+    color: var(--ink-2);
+  }
+  .ticks :global(svg) {
+    margin-top: 0.3em;
+    color: var(--ok);
+    stroke-width: 2.4;
+  }
+  .mail__privacy {
+    margin-top: 24px;
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+
+  .support__aside h2 {
+    font-size: 1.3rem;
+    margin-bottom: 16px;
+  }
+  .tips {
+    margin: 0;
+  }
+  .tips > div {
+    padding-block: 14px;
+    border-top: 1px solid var(--line);
+  }
+  .tips dt {
+    font-weight: 600;
+  }
+  .tips dd {
+    margin: 4px 0 0;
+    font-size: 0.96rem;
+    color: var(--ink-2);
+  }
+
+  @media (max-width: 860px) {
+    .support__grid {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

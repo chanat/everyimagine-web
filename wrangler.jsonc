@@ -1,0 +1,13 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "everyimagine-web",
+  "compatibility_date": "2026-11-01",
+
+  // A fully static site: Cloudflare serves the files Astro builds into ./dist.
+  // There is no server code.
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  }
+}

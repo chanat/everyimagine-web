@@ -1,0 +1,179 @@
+---
+import Base from '../layouts/Base.astro';
+import PrivacyEn from '../legal/PrivacyEn.astro';
+import PrivacyTh from '../legal/PrivacyTh.astro';
+import TermsEn from '../legal/TermsEn.astro';
+import TermsTh from '../legal/TermsTh.astro';
+import { PRIVACY_UPDATED, TERMS_UPDATED } from '../legal/meta';
+import { type Lang, href, t } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  doc: 'privacy' | 'terms';
+}
+const { lang, doc } = Astro.props;
+
+const meta = {
+  privacy: {
+    title: { en: 'Privacy Policy', th: 'นโยบายความเป็นส่วนตัว' },
+    description: {
+      en: 'How EveryImagine handles information in its apps, games and website.',
+      th: 'EveryImagine จัดการข้อมูลในแอพ เกม และเว็บไซต์อย่างไร',
+    },
+    intro: {
+      en: 'One policy for every EveryImagine app and game.',
+      th: 'นโยบายฉบับเดียวสำหรับทุกแอพและเกมของ EveryImagine',
+    },
+    updated: PRIVACY_UPDATED,
+    other: { path: '/terms', label: { en: 'Terms of Service', th: 'ข้อกำหนดการใช้งาน' } },
+  },
+  terms: {
+    title: { en: 'Terms of Service', th: 'ข้อกำหนดการใช้งาน' },
+    description: {
+      en: 'The terms that apply when you use EveryImagine apps, games and this website.',
+      th: 'ข้อกำหนดที่ใช้เมื่อคุณใช้แอพ เกม และเว็บไซต์ของ EveryImagine',
+    },
+    intro: {
+      en: 'The agreement between you and EveryImagine when you use our apps and games.',
+      th: 'ข้อตกลงระหว่างคุณกับ EveryImagine เมื่อคุณใช้แอพและเกมของเรา',
+    },
+    updated: TERMS_UPDATED,
+    other: { path: '/privacy', label: { en: 'Privacy Policy', th: 'นโยบายความเป็นส่วนตัว' } },
+  },
+}[doc];
+
+const Body = { privacy: { en: PrivacyEn, th: PrivacyTh }, terms: { en: TermsEn, th: TermsTh } }[doc][lang];
+---
+
+<Base lang={lang} path={`/${doc}`} title={meta.title[lang]} description={meta.description[lang]}>
+  <article class="legal wrap">
+    <header class="legal__head">
+      <p class="eyebrow">{t(lang, 'footer.legal')}</p>
+      <h1>{meta.title[lang]}</h1>
+      <p class="lead">{meta.intro[lang]}</p>
+      <p class="legal__meta">
+        <span>{t(lang, 'legal.updated')}: <strong>{meta.updated[lang]}</strong></span>
+        <a href={href(lang, meta.other.path)}>{meta.other.label[lang]} →</a>
+      </p>
+    </header>
+
+    <div class="legal__layout">
+      <nav class="legal__toc" aria-label={t(lang, 'legal.contents')}>
+        <p>{t(lang, 'legal.contents')}</p>
+        <ol id="toc"></ol>
+      </nav>
+      <div class="prose" id="legal-body">
+        <Body />
+      </div>
+    </div>
+  </article>
+</Base>
+
+<!-- is:inline so it runs again when the language switcher swaps this page in -->
+<script is:inline>
+  // Build the "On this page" list from the section headings.
+  (() => {
+    const toc = document.getElementById('toc');
+    if (!toc) return;
+    for (const h of document.querySelectorAll('#legal-body h2[id]')) {
+      const li = document.createElement('li');
+      const a = document.createElement('a');
+      a.href = `#${h.id}`;
+      a.textContent = (h.textContent ?? '').replace(/^\d+\.\s*/, '');
+      li.append(a);
+      toc.append(li);
+    }
+  })();
+</script>
+
+<style>
+  .legal {
+    padding-top: clamp(40px, 7vw, 80px);
+  }
+  .legal__head {
+    max-width: 46em;
+    padding-bottom: clamp(28px, 4vw, 44px);
+    border-bottom: 1px solid var(--line);
+  }
+  .legal__head h1 {
+    margin-top: 14px;
+    font-size: clamp(2.3rem, 6vw, 3.6rem);
+  }
+  .legal__head .lead {
+    margin-top: 16px;
+  }
+  .legal__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+    margin-top: 22px;
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+  .legal__meta strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .legal__layout {
+    display: grid;
+    grid-template-columns: 240px minmax(0, 46em);
+    gap: clamp(32px, 6vw, 80px);
+    padding-top: clamp(28px, 4vw, 48px);
+  }
+  .legal__toc {
+    position: sticky;
+    top: 96px;
+    align-self: start;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+    font-size: 0.92rem;
+  }
+  .legal__toc p {
+    margin-bottom: 10px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .legal__toc ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: toc;
+    border-left: 1px solid var(--line);
+  }
+  .legal__toc :global(li) {
+    counter-increment: toc;
+  }
+  .legal__toc :global(a) {
+    display: block;
+    padding: 5px 0 5px 14px;
+    margin-left: -1px;
+    border-left: 2px solid transparent;
+    color: var(--ink-2);
+    line-height: 1.35;
+    text-decoration: none;
+  }
+  .legal__toc :global(a:hover) {
+    border-left-color: var(--blue);
+    color: var(--ink);
+  }
+  .prose :global(> :first-child) {
+    margin-top: 0;
+  }
+
+  @media (max-width: 900px) {
+    .legal__layout {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .legal__toc {
+      position: static;
+      max-height: none;
+      padding: 18px 20px;
+      border: 1px solid var(--line);
+      border-radius: var(--r-md);
+      background: var(--surface);
+    }
+  }
+</style>

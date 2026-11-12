@@ -1,0 +1,88 @@
+---
+import type { AppEntry } from '../data/apps';
+import { type Lang, t } from '../i18n';
+
+interface Props {
+  app: AppEntry;
+  lang: Lang;
+}
+const { app, lang } = Astro.props;
+const stores = [
+  { key: 'ios', label: 'App Store', store: app.stores.ios },
+  { key: 'android', label: 'Google Play', store: app.stores.android },
+].filter((s) => s.store);
+---
+
+<ul class="stores">
+  {
+    stores.map(({ label, store }) => (
+      <li>
+        {store!.url ? (
+          <a class="store" href={store!.url} rel="noopener">
+            <small>{t(lang, 'app.getOn')}</small>
+            <span>{label}</span>
+          </a>
+        ) : (
+          <span class="store store--soon">
+            <small>{t(lang, 'app.soonOn')}</small>
+            <span>{label}</span>
+          </span>
+        )}
+        <p>{store!.requires[lang]}</p>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .stores {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .store {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 172px;
+    min-height: 58px;
+    padding: 8px 22px;
+    border-radius: 16px;
+    background: var(--ink);
+    color: #fff;
+    line-height: 1.2;
+    text-decoration: none;
+    box-shadow: 0 8px 22px rgb(24 19 31 / 0.2);
+    transition: transform 0.15s ease;
+  }
+  a.store:hover {
+    transform: translateY(-1px);
+  }
+  .store small {
+    font-size: 0.72rem;
+    font-weight: 500;
+    opacity: 0.75;
+  }
+  .store span {
+    font-family: var(--font-display);
+    font-size: 1.22rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+  .store--soon {
+    background: transparent;
+    color: var(--ink);
+    border: 1.5px dashed rgb(24 19 31 / 0.3);
+    box-shadow: none;
+  }
+  p {
+    margin-top: 8px;
+    font-size: 0.8rem;
+    color: var(--muted);
+    max-width: 16em;
+    line-height: 1.4;
+  }
+</style>

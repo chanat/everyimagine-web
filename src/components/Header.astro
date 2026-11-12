@@ -1,0 +1,132 @@
+---
+import Logo from './Logo.astro';
+import { type Lang, languages, href, t } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  path: string;
+}
+const { lang, path } = Astro.props;
+const home = href(lang, '/');
+const nav = [
+  { label: t(lang, 'nav.apps'), url: `${home}#apps` },
+  { label: t(lang, 'nav.studio'), url: `${home}#studio` },
+  { label: t(lang, 'nav.support'), url: href(lang, '/support') },
+];
+---
+
+<header class="site-header">
+  <div class="wrap site-header__inner">
+    <a class="site-header__logo" href={home} aria-label="EveryImagine">
+      <Logo uid="head" />
+    </a>
+
+    <nav class="site-nav" aria-label="Main">
+      {nav.map((item) => <a href={item.url}>{item.label}</a>)}
+    </nav>
+
+    <div class="lang" role="group" aria-label={t(lang, 'lang.switch')}>
+      {
+        (Object.keys(languages) as Lang[]).map((l) => (
+          <a
+            href={href(l, path)}
+            hreflang={l}
+            lang={l}
+            aria-current={l === lang ? 'true' : undefined}
+            title={languages[l]}
+          >
+            {l.toUpperCase()}
+          </a>
+        ))
+      }
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgb(255 255 255 / 0.72);
+    backdrop-filter: saturate(1.4) blur(14px);
+    -webkit-backdrop-filter: saturate(1.4) blur(14px);
+    border-bottom: 1px solid rgb(205 218 234 / 0.6);
+  }
+  .site-header__inner {
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 3vw, 32px);
+    min-height: 68px;
+  }
+  .site-header__logo {
+    text-decoration: none;
+    margin-right: auto;
+    font-size: 0.95rem;
+  }
+  .site-nav {
+    display: flex;
+    gap: clamp(4px, 1.5vw, 12px);
+  }
+  .site-nav a {
+    padding: 0.5em 0.8em;
+    border-radius: 999px;
+    color: var(--ink-2);
+    font-size: 0.96rem;
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .site-nav a:hover {
+    background: rgb(24 19 31 / 0.06);
+    color: var(--ink);
+  }
+  .lang {
+    display: flex;
+    padding: 3px;
+    border-radius: 999px;
+    background: rgb(24 19 31 / 0.06);
+  }
+  .lang a {
+    min-width: 38px;
+    padding: 0.3em 0.6em;
+    border-radius: 999px;
+    color: var(--muted);
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-align: center;
+    text-decoration: none;
+  }
+  .lang a[aria-current='true'] {
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 1px 3px rgb(24 19 31 / 0.14);
+  }
+
+  @media (max-width: 720px) {
+    /* two-row header on phones: don't let it stick and cover the page */
+    .site-header {
+      position: static;
+    }
+    .site-header__inner {
+      flex-wrap: wrap;
+      row-gap: 0;
+      padding-top: 10px;
+    }
+    .site-nav {
+      order: 3;
+      width: 100%;
+      margin-inline: -0.8em;
+      padding-block: 4px 8px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .site-nav::-webkit-scrollbar {
+      display: none;
+    }
+    .site-header__inner {
+      min-height: 0;
+    }
+  }
+</style>

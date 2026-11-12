@@ -1,0 +1,291 @@
+---
+// The privacy page of one app, e.g. /morningcam/privacy.
+// It states what is specific to that app; the general Privacy Policy covers the rest.
+// Everything here is generated from src/data/apps.ts.
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import { type AppEntry, privacyOf } from '../data/apps';
+import { type Lang, href, t, SUPPORT_EMAIL } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  app: AppEntry;
+}
+const { lang, app } = Astro.props;
+const facts = privacyOf(app);
+
+const c = {
+  en: {
+    title: `${app.name} Privacy`,
+    description: `How ${app.name} handles your information: what stays on your device, the permissions it asks for and the services it uses.`,
+    eyebrow: 'Privacy',
+    h1: `${app.name} and your privacy`,
+    lead: `This page describes what is specific to ${app.name}. It applies together with the EveryImagine Privacy Policy, which covers everything our apps have in common.`,
+    glance: 'At a glance',
+    permissions: 'Permissions the app may request',
+    permissionsNone: 'This app does not request any device permissions.',
+    permissionsNote:
+      'Your device asks you before a permission is used. You can refuse, and change your choice at any time in your device’s Settings.',
+    perm: 'Permission',
+    why: 'Why',
+    third: 'Third-party services',
+    thirdNone: 'This app does not use any third-party services.',
+    service: 'Service',
+    purpose: 'Purpose',
+    general: 'Everything else',
+    generalBody:
+      'Purchases, support requests, your rights, children’s privacy, data retention and how to contact us are covered by the general policy, which applies to this app too.',
+    generalCta: 'Read the EveryImagine Privacy Policy',
+    contact: 'Questions about privacy in this app?',
+    contactCta: 'Contact support',
+    back: `Back to ${app.name}`,
+  },
+  th: {
+    title: `ความเป็นส่วนตัวของ ${app.name}`,
+    description: `${app.name} จัดการข้อมูลของคุณอย่างไร: อะไรอยู่ในอุปกรณ์ สิทธิ์ที่แอพขอ และบริการที่แอพใช้`,
+    eyebrow: 'ความเป็นส่วนตัว',
+    h1: `${app.name} กับความเป็นส่วนตัวของคุณ`,
+    lead: `หน้านี้อธิบายเฉพาะสิ่งที่เกี่ยวกับ ${app.name} โดยใช้ร่วมกับนโยบายความเป็นส่วนตัวของ EveryImagine ซึ่งครอบคลุมทุกอย่างที่แอพของเรามีเหมือนกัน`,
+    glance: 'โดยสรุป',
+    permissions: 'สิทธิ์ที่แอพอาจขอ',
+    permissionsNone: 'แอพนี้ไม่ขอสิทธิ์ใดๆ บนอุปกรณ์',
+    permissionsNote:
+      'อุปกรณ์จะถามคุณก่อนใช้สิทธิ์ทุกครั้ง คุณปฏิเสธได้ และเปลี่ยนการตั้งค่าได้ทุกเมื่อในการตั้งค่าของอุปกรณ์',
+    perm: 'สิทธิ์',
+    why: 'เหตุผล',
+    third: 'บริการของบุคคลที่สาม',
+    thirdNone: 'แอพนี้ไม่ใช้บริการของบุคคลที่สาม',
+    service: 'บริการ',
+    purpose: 'วัตถุประสงค์',
+    general: 'เรื่องอื่นๆ ทั้งหมด',
+    generalBody:
+      'การซื้อ การขอความช่วยเหลือ สิทธิของคุณ ความเป็นส่วนตัวของเด็ก ระยะเวลาการเก็บข้อมูล และช่องทางติดต่อเรา อยู่ในนโยบายฉบับกลาง ซึ่งใช้กับแอพนี้ด้วย',
+    generalCta: 'อ่านนโยบายความเป็นส่วนตัวของ EveryImagine',
+    contact: 'มีคำถามเรื่องความเป็นส่วนตัวของแอพนี้?',
+    contactCta: 'ติดต่อฝ่ายช่วยเหลือ',
+    back: `กลับไปหน้า ${app.name}`,
+  },
+}[lang];
+---
+
+<Base lang={lang} path={`/${app.slug}/privacy`} title={c.title} description={c.description} image={app.ogImage}>
+  <article class="ap wrap" style={`--app:${app.accent};--app-soft:${app.accentSoft}`}>
+    <header class="ap__head">
+      <a class="ap__back" href={href(lang, `/${app.slug}`)}>← {c.back}</a>
+      <div class="ap__id">
+        <img src={app.icon} alt="" width="72" height="72" />
+        <div>
+          <p class="eyebrow">{c.eyebrow}</p>
+          <h1>{c.h1}</h1>
+        </div>
+      </div>
+      <p class="lead">{c.lead}</p>
+      <p class="ap__meta">
+        <span class="chip">{facts.label[lang]}</span>
+        <span>{t(lang, 'legal.updated')}: <strong>{facts.updated[lang]}</strong></span>
+      </p>
+    </header>
+
+    <div class="ap__body">
+      <section>
+        <h2 id="summary">{c.glance}</h2>
+        <ul class="ticks">
+          {
+            facts.points.map((p) => (
+              <li>
+                <Icon name="check" size={20} />
+                <span>{p[lang]}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </section>
+
+      <section class="prose">
+        <h2 id="permissions">{c.permissions}</h2>
+        {
+          facts.permissions.length > 0 ? (
+            <>
+              <div class="table-scroll">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>{c.perm}</th>
+                      <th>{c.why}</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {facts.permissions.map((p) => (
+                      <tr>
+                        <td>{p.name[lang]}</td>
+                        <td>{p.why[lang]}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <p class="note">{c.permissionsNote}</p>
+            </>
+          ) : (
+            <p>{c.permissionsNone}</p>
+          )
+        }
+      </section>
+
+      <section class="prose">
+        <h2 id="services">{c.third}</h2>
+        {
+          facts.thirdParties.length > 0 ? (
+            <div class="table-scroll">
+              <table>
+                <thead>
+                  <tr>
+                    <th>{c.service}</th>
+                    <th>{c.purpose}</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {facts.thirdParties.map((s) => (
+                    <tr>
+                      <td>{s.name}</td>
+                      <td>{s.purpose[lang]}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <p>{c.thirdNone}</p>
+          )
+        }
+      </section>
+
+      <section class="ap__general">
+        <h2 id="general">{c.general}</h2>
+        <p>{c.generalBody}</p>
+        <a class="btn btn--primary" href={href(lang, '/privacy')}>{c.generalCta} <Icon name="arrow" size={18} /></a>
+      </section>
+
+      <p class="ap__contact">
+        {c.contact}
+        <a href={`${href(lang, '/support')}?app=${app.slug}`}>{c.contactCta}</a> ·
+        <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
+      </p>
+    </div>
+  </article>
+</Base>
+
+<style>
+  .ap {
+    padding-top: clamp(28px, 5vw, 56px);
+    max-width: 860px;
+  }
+  .ap__back {
+    display: inline-block;
+    margin-bottom: clamp(20px, 3vw, 32px);
+    color: var(--muted);
+    font-size: 0.95rem;
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .ap__back:hover {
+    color: var(--ink);
+  }
+  .ap__id {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .ap__id img {
+    flex: none;
+    width: 72px;
+    height: 72px;
+    border-radius: 22.5%;
+    box-shadow:
+      0 0 0 1px rgb(24 19 31 / 0.08),
+      0 10px 22px rgb(24 19 31 / 0.14);
+  }
+  .ap__head h1 {
+    margin-top: 8px;
+    font-size: clamp(1.9rem, 4.8vw, 3rem);
+  }
+  .ap__head .lead {
+    margin-top: 20px;
+    max-width: 40em;
+  }
+  .ap__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px 20px;
+    margin-top: 20px;
+    padding-bottom: clamp(24px, 4vw, 36px);
+    border-bottom: 1px solid var(--line);
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+  .ap__meta .chip {
+    background: var(--app-soft);
+    color: var(--app);
+  }
+  .ap__meta strong {
+    color: var(--ink);
+    font-weight: 600;
+  }
+  .ap__body {
+    display: grid;
+    gap: clamp(32px, 5vw, 48px);
+    padding-top: clamp(28px, 4vw, 40px);
+  }
+  .ap__body h2 {
+    margin: 0 0 16px;
+    font-size: clamp(1.35rem, 2.4vw, 1.7rem);
+    color: var(--ink);
+  }
+  .ticks {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ticks li {
+    display: grid;
+    grid-template-columns: 20px minmax(0, 1fr);
+    gap: 12px;
+    color: var(--ink-2);
+  }
+  .ticks :global(svg) {
+    margin-top: 0.3em;
+    color: var(--ok);
+    stroke-width: 2.4;
+  }
+  td:first-child {
+    min-width: 11em;
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .note {
+    font-size: 0.93rem;
+    color: var(--muted);
+  }
+  .ap__general {
+    padding: clamp(22px, 3.6vw, 36px);
+    border-radius: var(--r-lg);
+    background: var(--paper-2);
+  }
+  .ap__general p {
+    color: var(--ink-2);
+    max-width: 44em;
+  }
+  .ap__general .btn {
+    margin-top: 20px;
+  }
+  .ap__contact {
+    color: var(--muted);
+    font-size: 0.97rem;
+  }
+  .ap__contact a {
+    font-weight: 500;
+  }
+</style>

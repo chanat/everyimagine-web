@@ -1,0 +1,600 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import Phone from '../components/Phone.astro';
+import HeroWeather from '../components/HeroWeather.astro';
+import { apps } from '../data/apps';
+import { type Lang, href, t } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+
+const c = {
+  en: {
+    title: 'EveryImagine · App & game studio in Bangkok',
+    description:
+      'EveryImagine is a studio in Bangkok that turns ideas into apps and casual games for iOS and Android.',
+    eyebrow: 'App & game studio · Bangkok',
+    h1a: 'Every idea we ',
+    h1b: 'imagine',
+    h1c: ', made real.',
+    lead: 'EveryImagine is a studio in Bangkok. We make friendly apps and casual games for iOS and Android.',
+    cta1: 'See our apps',
+    cta2: 'About the studio',
+    heroAlt:
+      'A floating island with a Thai temple, a blue tuk-tuk and a sky train, with blue, green and yellow app icons, sparkles and a game controller swirling up from it',
+    appsEyebrow: 'Apps & games',
+    appsTitle: 'What we’ve made',
+    appsLead: 'Small, carefully made things that are easy to pick up and nice to come back to.',
+    moreTitle: 'More on the way',
+    moreBody: 'New apps and casual games are taking shape in the studio. Check back soon.',
+    studioEyebrow: 'The studio',
+    studioTitle: 'If we can imagine it, we can make it.',
+    studioP1:
+      'The name says it all. EveryImagine is where the things we imagine become things you can use. Every app and game here began as an idea we could not stop thinking about.',
+    studioP2:
+      'So that is what we do. We imagine useful, delightful little things, then design, build and polish them until they are ready for your phone.',
+    facts: [
+      { icon: 'pin', title: 'Bangkok, Thailand', body: 'Where we imagine and build.' },
+      { icon: 'phone', title: 'iOS and Android', body: 'Made for the phone in your hand.' },
+      { icon: 'gamepad', title: 'Apps and casual games', body: 'Simple to start, pleasant to keep.' },
+    ],
+    stepsTitle: 'How an idea becomes an app',
+    steps: [
+      { n: '01', title: 'Imagine', body: 'It starts with a “what if?” and a clear picture of who it is for.' },
+      { n: '02', title: 'Make', body: 'We design, build and test it, keeping it simple, fast and friendly.' },
+      { n: '03', title: 'Share', body: 'We release it on the App Store and Google Play, then keep improving it.' },
+    ],
+    helpTitle: 'Need help with one of our apps?',
+    helpBody: 'Tell us what happened and we will get back to you by email.',
+    helpCta: 'Contact support',
+  },
+  th: {
+    title: 'EveryImagine · สตูดิโอสร้างแอพและเกม จากกรุงเทพฯ',
+    description:
+      'EveryImagine คือสตูดิโอในกรุงเทพฯ ที่เปลี่ยนไอเดียให้เป็นแอพและเกมแคชชวลสำหรับ iOS และ Android',
+    eyebrow: 'สตูดิโอแอพและเกม · กรุงเทพฯ',
+    h1a: 'ทุก',
+    h1b: 'จินตนาการ',
+    h1c: ' สร้างให้เป็นจริง',
+    lead: 'EveryImagine คือสตูดิโอในกรุงเทพฯ เราสร้างแอพที่ใช้ง่ายและเกมแคชชวลสำหรับ iOS และ Android',
+    cta1: 'ดูแอพของเรา',
+    cta2: 'รู้จักสตูดิโอ',
+    heroAlt:
+      'เกาะลอยฟ้าที่มีวัดไทย รถตุ๊กตุ๊ก และรถไฟฟ้า มีไอคอนแอพ ประกายดาว และจอยเกมลอยหมุนขึ้นไป',
+    appsEyebrow: 'แอพและเกม',
+    appsTitle: 'ผลงานของเรา',
+    appsLead: 'งานชิ้นเล็กๆ ที่ตั้งใจทำ หยิบมาใช้ง่าย และอยากกลับมาใช้อีก',
+    moreTitle: 'กำลังจะมีเพิ่มอีก',
+    moreBody: 'แอพและเกมแคชชวลใหม่ๆ กำลังเป็นรูปเป็นร่างอยู่ในสตูดิโอ แล้วกลับมาดูกันใหม่เร็วๆ นี้',
+    studioEyebrow: 'สตูดิโอ',
+    studioTitle: 'ถ้าจินตนาการได้ เราก็สร้างได้',
+    studioP1:
+      'ชื่อของเราบอกทุกอย่าง EveryImagine คือที่ที่สิ่งที่เราจินตนาการกลายเป็นสิ่งที่คุณใช้ได้จริง แอพและเกมทุกตัวที่นี่เริ่มจากไอเดียที่เราเลิกคิดถึงไม่ได้',
+    studioP2:
+      'นั่นคือสิ่งที่เราทำ เราจินตนาการถึงสิ่งเล็กๆ ที่มีประโยชน์และน่าใช้ แล้วออกแบบ สร้าง และขัดเกลาจนพร้อมอยู่บนมือถือของคุณ',
+    facts: [
+      { icon: 'pin', title: 'กรุงเทพฯ ประเทศไทย', body: 'สตูดิโอของคนไทย' },
+      { icon: 'phone', title: 'iOS และ Android', body: 'ทำมาเพื่อมือถือในมือคุณ' },
+      { icon: 'gamepad', title: 'แอพและเกมแคชชวล', body: 'เริ่มง่าย ใช้เพลิน' },
+    ],
+    stepsTitle: 'จากไอเดียสู่แอพ',
+    steps: [
+      { n: '01', title: 'จินตนาการ', body: 'เริ่มจากคำถามว่า “ถ้ามีแบบนี้ล่ะ?” และภาพที่ชัดว่าทำให้ใครใช้' },
+      { n: '02', title: 'สร้าง', body: 'เราออกแบบ พัฒนา และทดสอบ ให้เรียบง่าย เร็ว และเป็นมิตร' },
+      { n: '03', title: 'ส่งต่อ', body: 'ปล่อยขึ้น App Store และ Google Play แล้วปรับปรุงต่อเนื่อง' },
+    ],
+    helpTitle: 'ต้องการความช่วยเหลือเกี่ยวกับแอพของเรา?',
+    helpBody: 'เล่าให้เราฟังว่าเกิดอะไรขึ้น แล้วเราจะตอบกลับทางอีเมล',
+    helpCta: 'ติดต่อฝ่ายช่วยเหลือ',
+  },
+}[lang];
+---
+
+<Base lang={lang} path="/" title={c.title} description={c.description}>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="wrap hero__inner">
+      <div class="hero__copy">
+        <p class="eyebrow">{c.eyebrow}</p>
+        <h1>{c.h1a}<span class="spark-text">{c.h1b}</span>{c.h1c}</h1>
+        <p class="lead">{c.lead}</p>
+        <div class="hero__cta">
+          <a class="btn btn--primary" href="#apps">{c.cta1} <Icon name="arrow" size={18} /></a>
+          <a class="btn btn--ghost" href="#studio">{c.cta2}</a>
+        </div>
+      </div>
+      <div class="hero__art">
+        <img
+          src="/images/hero-bangkok.webp"
+          srcset="/images/hero-bangkok-720.webp 720w, /images/hero-bangkok-1200.webp 1200w, /images/hero-bangkok-1800.webp 1800w"
+          sizes="(max-width: 860px) min(92vw, 520px), 640px"
+          width="1432"
+          height="1080"
+          alt={c.heroAlt}
+          fetchpriority="high"
+        />
+        <HeroWeather />
+      </div>
+    </div>
+  </section>
+
+  <!-- Apps -->
+  <section class="section apps" id="apps">
+    <div class="wrap">
+      <header class="section-head">
+        <p class="eyebrow">{c.appsEyebrow}</p>
+        <h2>{c.appsTitle}</h2>
+        <p class="lead">{c.appsLead}</p>
+      </header>
+
+      <div class="showcase">
+        {
+          apps.map((app) => (
+            <article class="app card" style={`--app:${app.accent};--app-soft:${app.accentSoft}`}>
+              <div class="app__copy">
+                <div class="app__id">
+                  <img class="app__icon" src={app.icon} alt="" width="72" height="72" loading="lazy" />
+                  <div>
+                    <h3>
+                      <a href={href(lang, `/${app.slug}`)}>{app.name}</a>
+                    </h3>
+                    <p class="app__cat">{app.category[lang]}</p>
+                  </div>
+                </div>
+                <p class="app__tagline">{app.tagline[lang]}</p>
+                <p class="app__summary">{app.summary[lang]}</p>
+                <div class="app__chips">
+                  <span class={`chip ${app.status === 'released' ? 'chip--live' : 'chip--soon'}`}>
+                    {t(lang, app.status === 'released' ? 'status.released' : 'status.coming')}
+                  </span>
+                  <span class="chip">{t(lang, app.kind === 'game' ? 'kind.game' : 'kind.app')}</span>
+                  {app.stores.ios && <span class="chip">iOS</span>}
+                  {app.stores.android && <span class="chip">Android</span>}
+                </div>
+                <span class="btn btn--primary app__btn" aria-hidden="true">
+                  {t(lang, 'app.view')} <Icon name="arrow" size={18} />
+                </span>
+              </div>
+              <div class="app__shots" aria-hidden="true">
+                {app.screenshots[lang].slice(0, 2).map((s) => (
+                  <div class="app__shot">
+                    <Phone src={s.src} alt="" />
+                  </div>
+                ))}
+              </div>
+            </article>
+          ))
+        }
+
+        <div class="more">
+          <span class="more__spark"><Icon name="spark" size={26} /></span>
+          <div>
+            <h3>{c.moreTitle}</h3>
+            <p>{c.moreBody}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Studio -->
+  <section class="section studio" id="studio">
+    <div class="wrap">
+      <div class="studio__grid">
+        <div class="studio__copy">
+          <p class="eyebrow">{c.studioEyebrow}</p>
+          <h2>{c.studioTitle}</h2>
+          <p>{c.studioP1}</p>
+          <p>{c.studioP2}</p>
+        </div>
+        <ul class="facts">
+          {
+            c.facts.map((f) => (
+              <li class="card">
+                <span class="facts__icon"><Icon name={f.icon as any} /></span>
+                <div>
+                  <h3>{f.title}</h3>
+                  <p>{f.body}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <h3 class="steps__title">{c.stepsTitle}</h3>
+      <ol class="steps">
+        {
+          c.steps.map((s) => (
+            <li>
+              <span class="steps__n">{s.n}</span>
+              <h4>{s.title}</h4>
+              <p>{s.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </section>
+
+  <!-- Help -->
+  <section class="wrap">
+    <div class="help">
+      <div>
+        <h2>{c.helpTitle}</h2>
+        <p>{c.helpBody}</p>
+      </div>
+      <a class="btn" href={href(lang, '/support')}>{c.helpCta} <Icon name="arrow" size={18} /></a>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* ---------- hero ---------- */
+  .hero {
+    position: relative;
+    /* clip sideways only (the picture reaches a little past the column); light may spill up and down */
+    overflow-x: clip;
+  }
+  .hero__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.08fr);
+    align-items: center;
+    gap: clamp(16px, 3vw, 40px);
+    padding-block: clamp(28px, 4.5vw, 56px) clamp(32px, 5vw, 64px);
+  }
+  .hero h1 {
+    margin-top: 20px;
+    font-size: clamp(2.7rem, 7.4vw, 5.2rem);
+    font-weight: 800;
+    letter-spacing: -0.045em;
+    line-height: 1;
+    /* white light glowing out from behind the letters.
+       drop-shadow (not text-shadow) so it also sits behind the gradient word. */
+    filter: drop-shadow(0 0 5px #fff) drop-shadow(0 0 16px #fff) drop-shadow(0 0 34px #fff)
+      drop-shadow(0 0 70px rgb(255 255 255 / 0.9));
+  }
+  /* a pool of white light behind the whole headline block */
+  .hero__copy {
+    position: relative;
+  }
+  .hero__copy::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: -12% -22% -6% -30%;
+    background: radial-gradient(closest-side, rgb(255 255 255 / 0.95) 0%, rgb(255 255 255 / 0.6) 45%, transparent 100%);
+    pointer-events: none;
+  }
+  html[lang='th'] .hero h1 {
+    font-size: clamp(2.4rem, 6.4vw, 4.4rem);
+    line-height: 1.22;
+    letter-spacing: -0.01em;
+  }
+  .hero .lead {
+    margin-top: 24px;
+  }
+  .hero__cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 32px;
+  }
+  .hero__art {
+    position: relative;
+    margin-right: clamp(-56px, -3.5vw, 0px);
+  }
+  /* bright white light glowing out from behind the picture */
+  .hero__art::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    inset: -9% -7% -6%;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      #fff 0%,
+      rgb(255 255 255 / 0.96) 46%,
+      rgb(255 255 255 / 0.6) 72%,
+      rgb(255 255 255 / 0) 100%
+    );
+    pointer-events: none;
+  }
+  .hero__art img {
+    width: 100%;
+    /* the illustration has a white backdrop: multiply lets the page's colour wash show through it */
+    mix-blend-mode: multiply;
+  }
+  /* ---------- section heads ---------- */
+  .section-head {
+    max-width: 40em;
+    margin-bottom: clamp(32px, 5vw, 56px);
+  }
+  .section-head h2,
+  .studio__copy h2 {
+    margin-top: 14px;
+    font-size: clamp(2rem, 4.6vw, 3.2rem);
+  }
+  .section-head .lead {
+    margin-top: 14px;
+  }
+
+  /* ---------- showcase ---------- */
+  .apps {
+    padding-top: clamp(40px, 6vw, 72px);
+  }
+  .showcase {
+    display: grid;
+    gap: 24px;
+  }
+  .app {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 0.95fr);
+    overflow: hidden;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+  .app:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+  }
+  .app:nth-child(even) .app__copy {
+    order: 2;
+  }
+  .app__copy {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: clamp(24px, 4.4vw, 56px);
+  }
+  .app__id {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .app__icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 22.5%;
+    box-shadow:
+      0 0 0 1px rgb(24 19 31 / 0.08),
+      0 8px 18px rgb(24 19 31 / 0.14);
+  }
+  .app h3 {
+    font-size: clamp(1.7rem, 3.2vw, 2.3rem);
+  }
+  .app h3 a {
+    color: inherit;
+    text-decoration: none;
+  }
+  /* whole card is the link target */
+  .app h3 a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: var(--r-lg);
+  }
+  .app__cat {
+    margin-top: 4px;
+    font-size: 0.92rem;
+    color: var(--muted);
+  }
+  .app__tagline {
+    margin-top: 24px;
+    font-family: var(--font-display);
+    font-size: clamp(1.2rem, 2.2vw, 1.5rem);
+    font-weight: 600;
+    line-height: 1.3;
+    letter-spacing: -0.015em;
+    color: var(--app);
+  }
+  .app__summary {
+    margin-top: 10px;
+    color: var(--ink-2);
+    max-width: 30em;
+  }
+  .app__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 20px;
+  }
+  .app__btn {
+    margin-top: 28px;
+  }
+  .app:hover .app__btn {
+    background: var(--yellow-deep);
+  }
+  .app__shots {
+    position: relative;
+    min-height: 420px;
+    background:
+      radial-gradient(120% 90% at 80% 0%, rgb(255 255 255 / 0.9) 0%, transparent 60%),
+      var(--app-soft);
+    overflow: hidden;
+  }
+  .app__shot {
+    position: absolute;
+    width: 46%;
+    top: 11%;
+    left: 12%;
+    transform: rotate(-5deg);
+  }
+  .app__shot + .app__shot {
+    top: 20%;
+    left: 47%;
+    transform: rotate(4deg);
+  }
+
+  .more {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    padding: clamp(22px, 3.4vw, 36px) clamp(24px, 4.4vw, 56px);
+    border: 2px dashed rgb(24 19 31 / 0.16);
+    border-radius: var(--r-lg);
+  }
+  .more__spark {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    background: var(--spark);
+    color: #fff;
+  }
+  .more__spark :global(svg) {
+    fill: currentColor;
+  }
+  .more h3 {
+    font-size: 1.35rem;
+  }
+  .more p {
+    margin-top: 4px;
+    color: var(--ink-2);
+  }
+
+  /* ---------- studio ---------- */
+  .studio {
+    background: linear-gradient(180deg, transparent, var(--paper-2) 22%, var(--paper-2) 78%, transparent);
+  }
+  .studio__grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: clamp(32px, 6vw, 80px);
+    align-items: center;
+  }
+  .studio__copy p:not(.eyebrow) {
+    margin-top: 20px;
+    font-size: 1.12rem;
+    color: var(--ink-2);
+    max-width: 34em;
+  }
+  .facts {
+    display: grid;
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .facts li {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 22px;
+    border-radius: var(--r-md);
+  }
+  .facts__icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    background: var(--paper-2);
+    color: var(--blue);
+  }
+  .facts h3 {
+    font-size: 1.1rem;
+    letter-spacing: -0.01em;
+  }
+  .facts p {
+    font-size: 0.95rem;
+    color: var(--muted);
+  }
+  .steps__title {
+    margin-top: clamp(56px, 8vw, 96px);
+    font-size: clamp(1.4rem, 2.6vw, 1.8rem);
+  }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(20px, 3vw, 40px);
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .steps li {
+    padding-top: 20px;
+    border-top: 2px solid var(--ink);
+  }
+  .steps__n {
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 700;
+    background: var(--spark-text);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .steps h4 {
+    margin-top: 6px;
+    font-size: 1.5rem;
+  }
+  .steps p {
+    margin-top: 8px;
+    color: var(--ink-2);
+  }
+
+  /* ---------- help band ---------- */
+  .help {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: clamp(28px, 5vw, 56px);
+    border-radius: var(--r-lg);
+    background: var(--spark);
+    color: #fff;
+  }
+  .help h2 {
+    font-size: clamp(1.6rem, 3.4vw, 2.3rem);
+  }
+  .help p {
+    margin-top: 8px;
+    font-size: 1.08rem;
+    opacity: 0.95;
+  }
+  .help .btn {
+    background: var(--yellow);
+    color: var(--ink);
+    box-shadow: 0 10px 26px rgb(12 21 54 / 0.28);
+  }
+  .help .btn:hover {
+    background: #ffd84d;
+  }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 860px) {
+    .hero__inner {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .hero__art {
+      order: -1;
+      max-width: 520px;
+      margin: -12px auto -28px;
+    }
+    .app {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .app:nth-child(even) .app__copy {
+      order: 0;
+    }
+    .app__shots {
+      min-height: 0;
+      aspect-ratio: 5 / 4;
+    }
+    .studio__grid,
+    .steps {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+</style>

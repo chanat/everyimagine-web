@@ -1,0 +1,16 @@
+---
+// The privacy page of each app, e.g. /th/morningcam/privacy
+import AppPrivacyView from '../../../views/AppPrivacyView.astro';
+import { apps, type AppEntry } from '../../../data/apps';
+
+export function getStaticPaths() {
+  return apps.map((app) => ({ params: { slug: app.slug }, props: { app } }));
+}
+
+interface Props {
+  app: AppEntry;
+}
+const { app } = Astro.props;
+---
+
+<AppPrivacyView lang="th" app={app} />

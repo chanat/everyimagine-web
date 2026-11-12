@@ -1,0 +1,41 @@
+---
+// EveryImagine logo: a happy elephant with its trunk raised and a spark of imagination,
+// inside an app-icon shape. The mark itself lives in public/favicon.svg, so the
+// browser tab icon and the logo are always the same drawing.
+interface Props {
+  size?: number;
+  wordmark?: boolean;
+  /** kept for older call sites; no longer needed */
+  uid?: string;
+}
+const { size = 34, wordmark = true } = Astro.props;
+---
+
+<span class="logo">
+  <img class="logo__mark" src="/favicon.svg" width={size} height={size} alt="" decoding="async" />
+  {wordmark && <span class="logo__word" translate="no">Every<b>Imagine</b></span>}
+</span>
+
+<style>
+  .logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6em;
+    color: var(--ink);
+    line-height: 1;
+  }
+  .logo__mark {
+    flex: none;
+    filter: drop-shadow(0 4px 10px rgb(255 176 0 / 0.4));
+  }
+  .logo__word {
+    white-space: nowrap;
+    font-family: var(--font-display);
+    font-size: 1.28em;
+    font-weight: 500;
+    letter-spacing: -0.035em;
+  }
+  .logo__word b {
+    font-weight: 800;
+  }
+</style>

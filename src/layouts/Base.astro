@@ -1,0 +1,234 @@
+---
+import '@fontsource-variable/bricolage-grotesque';
+import '@fontsource-variable/anuphan';
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { type Lang, languages, href, t, SITE_NAME, SITE_URL } from '../i18n';
+
+interface Props {
+  lang: Lang;
+  /** language-neutral path of this page, e.g. "/" or "/privacy" */
+  path: string;
+  title: string;
+  description: string;
+  image?: string;
+  noindex?: boolean;
+}
+
+const { lang, path, title, description, image = '/images/og.jpg', noindex = false } = Astro.props;
+const fullTitle = path === '/' ? title : `${title} · ${SITE_NAME}`;
+const abs = (p: string) => new URL(p, SITE_URL).href;
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="canonical" href={abs(href(lang, path))} />
+    {
+      !noindex &&
+        (Object.keys(languages) as Lang[]).map((l) => (
+          <link rel="alternate" hreflang={l} href={abs(href(l, path))} />
+        ))
+    }
+    {!noindex && <link rel="alternate" hreflang="x-default" href={abs(href('en', path))} />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta name="theme-color" content="#ffffff" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE_NAME} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={abs(href(lang, path))} />
+    <meta property="og:image" content={abs(image)} />
+    <meta property="og:locale" content={lang === 'th' ? 'th_TH' : 'en_US'} />
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <script>
+      // In-place language switch.
+      // Every page exists at two URLs (/x and /th/x). Clicking EN / TH fetches the other
+      // version and swaps it into the current document: no page load, the reader stays at
+      // the same spot, and anything typed into a form is kept. The address bar still
+      // changes, so each language stays linkable. Without JavaScript the links simply navigate.
+
+      const pages = new Map<string, Promise<string>>();
+
+      function getPage(path: string): Promise<string> {
+        let page = pages.get(path);
+        if (!page) {
+          page = fetch(path, { headers: { Accept: 'text/html' } }).then((res) => {
+            if (!res.ok) throw new Error(`HTTP ${res.status}`);
+            return res.text();
+          });
+          page.catch(() => pages.delete(path));
+          pages.set(path, page);
+        }
+        return page;
+      }
+
+      /** Fetch the other language ahead of time so the switch is instant. */
+      function prefetch() {
+        for (const a of document.querySelectorAll<HTMLAnchorElement>('.lang a:not([aria-current])')) {
+          getPage(a.pathname).catch(() => {});
+        }
+        // Warm the Thai and Latin subsets of the fonts too, so text does not reflow after a switch.
+        for (const family of ['Anuphan Variable', 'Bricolage Grotesque Variable']) {
+          document.fonts?.load(`1em "${family}"`, 'Aa กขค').catch(() => {});
+        }
+      }
+
+      // Both languages are rendered from the same template, so the n-th of these elements
+      // is the same piece of content in either language.
+      const LANDMARKS = 'main h1, main h2, main h3, main section, main li, main p';
+      const HEADER_OFFSET = 80;
+
+      function readPosition() {
+        const all = [...document.querySelectorAll(LANDMARKS)];
+        const index = all.findIndex((el) => el.getBoundingClientRect().bottom > HEADER_OFFSET);
+        // Fallback when one language has an extra paragraph: the last element with an id
+        // (ids are the same in both languages) that starts above the middle of the screen.
+        const marked = [...document.querySelectorAll<HTMLElement>('main [id]')]
+          .filter((el) => el.getBoundingClientRect().top < window.innerHeight / 2)
+          .pop();
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        return {
+          count: all.length,
+          index,
+          top: index >= 0 ? all[index].getBoundingClientRect().top : 0,
+          id: marked?.id,
+          idTop: marked?.getBoundingClientRect().top ?? 0,
+          ratio: max > 0 ? window.scrollY / max : 0,
+          atTop: window.scrollY < 4,
+        };
+      }
+
+      function restorePosition(pos: ReturnType<typeof readPosition>) {
+        const scrollBy = (delta: number) => window.scrollTo({ top: window.scrollY + delta, behavior: 'instant' });
+        if (pos.atTop) return window.scrollTo({ top: 0, behavior: 'instant' });
+        const all = [...document.querySelectorAll(LANDMARKS)];
+        const marked = pos.id ? document.getElementById(pos.id) : null;
+        if (pos.index >= 0 && all.length === pos.count) {
+          scrollBy(all[pos.index].getBoundingClientRect().top - pos.top);
+        } else if (marked) {
+          scrollBy(marked.getBoundingClientRect().top - pos.idTop);
+        } else {
+          const max = document.documentElement.scrollHeight - window.innerHeight;
+          window.scrollTo({ top: pos.ratio * max, behavior: 'instant' });
+        }
+      }
+
+      type Field = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+      const fields = () =>
+        [...document.querySelectorAll<Field>('main form [name]')].filter((el) => el.type !== 'hidden');
+
+      function readForms() {
+        return fields().map((el) => ({
+          name: el.name,
+          value: el instanceof HTMLSelectElement ? el.selectedIndex : el.value,
+        }));
+      }
+
+      function restoreForms(saved: ReturnType<typeof readForms>) {
+        const byName = new Map(fields().map((el) => [el.name, el]));
+        for (const { name, value } of saved) {
+          const el = byName.get(name);
+          if (!el) continue;
+          if (el instanceof HTMLSelectElement) el.selectedIndex = value as number;
+          else el.value = value as string;
+        }
+      }
+
+      const HEAD_PER_PAGE =
+        'meta[name="description"], meta[name="robots"], link[rel="canonical"], link[rel="alternate"], meta[property^="og:"]';
+
+      function swap(next: Document) {
+        const position = readPosition();
+        const forms = readForms();
+
+        document.documentElement.lang = next.documentElement.lang;
+        document.title = next.title;
+        for (const el of document.head.querySelectorAll(HEAD_PER_PAGE)) el.remove();
+        for (const el of next.head.querySelectorAll(HEAD_PER_PAGE)) document.head.append(document.importNode(el, true));
+        for (const link of next.head.querySelectorAll<HTMLLinkElement>('link[rel="stylesheet"]')) {
+          const href = link.getAttribute('href');
+          if (href && !document.head.querySelector(`link[rel="stylesheet"][href="${href}"]`)) {
+            document.head.append(document.importNode(link, true));
+          }
+        }
+
+        document.body.innerHTML = next.body.innerHTML;
+
+        // Scripts inserted through innerHTML do not run: re-create them so they do.
+        for (const old of document.body.querySelectorAll('script')) {
+          const fresh = document.createElement('script');
+          for (const attr of old.attributes) fresh.setAttribute(attr.name, attr.value);
+          fresh.textContent = old.textContent;
+          old.replaceWith(fresh);
+        }
+
+        restoreForms(forms);
+        restorePosition(position);
+        document.querySelector<HTMLElement>('.lang a[aria-current="true"]')?.focus({ preventScroll: true });
+        prefetch();
+
+        // If a font finishes loading after the swap the text reflows: line the page up once more,
+        // unless the reader has already scrolled somewhere else.
+        const settled = window.scrollY;
+        document.fonts?.ready.then(() => {
+          if (Math.abs(window.scrollY - settled) < 4) restorePosition(position);
+        });
+      }
+
+      let currentPath = location.pathname;
+
+      async function switchTo(url: string, push: boolean) {
+        const path = new URL(url, location.href).pathname;
+        let html: string;
+        try {
+          html = await getPage(path);
+        } catch {
+          location.href = url; // fall back to a normal navigation
+          return;
+        }
+        const next = new DOMParser().parseFromString(html, 'text/html');
+        if (push) history.pushState({}, '', url);
+        currentPath = location.pathname;
+
+        swap(next);
+      }
+
+      document.addEventListener('click', (event) => {
+        if (event.defaultPrevented || event.button !== 0) return;
+        if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        const link = (event.target as Element | null)?.closest?.<HTMLAnchorElement>('.lang a');
+        if (!link) return;
+        event.preventDefault();
+        if (link.getAttribute('aria-current') === 'true') return;
+        switchTo(link.pathname + location.search + location.hash, true);
+      });
+
+      // Back / forward across a language switch.
+      window.addEventListener('popstate', () => {
+        if (location.pathname !== currentPath) switchTo(location.href, false);
+      });
+
+      if ('requestIdleCallback' in window) requestIdleCallback(prefetch);
+      else setTimeout(prefetch, 1200);
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t(lang, 'skip')}</a>
+    <Header lang={lang} path={path} />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer lang={lang} />
+  </body>
+</html>

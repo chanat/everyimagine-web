@@ -1,0 +1,16 @@
+---
+// One page per entry in src/data/apps.ts, e.g. /morningcam
+import AppView from '../../views/AppView.astro';
+import { apps, type AppEntry } from '../../data/apps';
+
+export function getStaticPaths() {
+  return apps.map((app) => ({ params: { slug: app.slug }, props: { app } }));
+}
+
+interface Props {
+  app: AppEntry;
+}
+const { app } = Astro.props;
+---
+
+<AppView lang="th" app={app} />

@@ -1,0 +1,299 @@
+---
+// Weather that drifts over the hero illustration: sunshine, then wind, then rain, on a loop.
+// The picture itself never moves; these are light CSS / SVG layers on top of it.
+// Purely decorative, and switched off for people who prefer reduced motion.
+---
+
+<div class="weather" aria-hidden="true">
+  <!-- 1. sunshine -->
+  <div class="wx wx--sun">
+    <span class="glow"></span>
+    <span class="sun"></span>
+  </div>
+
+  <!-- 2. wind -->
+  <div class="wx wx--wind">
+    <svg class="gusts" viewBox="0 0 400 300" preserveAspectRatio="none">
+      <path pathLength="500" d="M-10 78 C 70 52, 150 104, 235 72 S 350 52, 410 84"></path>
+      <path pathLength="500" d="M-10 132 C 60 112, 140 160, 225 128 C 262 114, 268 92, 248 90 C 232 89, 228 108, 246 112 C 300 122, 360 112, 410 136"></path>
+      <path pathLength="500" d="M-10 196 C 80 176, 160 222, 250 190 S 360 174, 410 200"></path>
+      <path pathLength="500" d="M-10 248 C 70 232, 150 266, 235 244 S 350 232, 410 252"></path>
+    </svg>
+    <span class="leaf leaf--1"></span>
+    <span class="leaf leaf--2"></span>
+    <span class="leaf leaf--3"></span>
+    <span class="leaf leaf--4"></span>
+  </div>
+
+  <!-- 3. rain -->
+  <div class="wx wx--rain">
+    <span class="drops"></span>
+    <svg class="cloud cloud--a" viewBox="0 0 200 92">
+      <defs>
+        <linearGradient id="wx-cloud" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#e3ebf6"></stop>
+          <stop offset="1" stop-color="#9fb2cc"></stop>
+        </linearGradient>
+      </defs>
+      <path
+        fill="url(#wx-cloud)"
+        d="M50 86c-22 0-39-14-39-32 0-17 13-30 30-32C47 9 61 0 78 0c18 0 33 10 39 25 4-2 9-3 14-3 21 0 37 14 37 32s-16 32-37 32z"
+      ></path>
+    </svg>
+    <svg class="cloud cloud--b" viewBox="0 0 200 92">
+      <path
+        fill="url(#wx-cloud)"
+        d="M50 86c-22 0-39-14-39-32 0-17 13-30 30-32C47 9 61 0 78 0c18 0 33 10 39 25 4-2 9-3 14-3 21 0 37 14 37 32s-16 32-37 32z"
+      ></path>
+    </svg>
+  </div>
+</div>
+
+<style>
+  .weather {
+    --cycle: 27s; /* one full loop: 9s each of sun, wind and rain */
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    container-type: size; /* lets the leaves travel in units of the picture's size */
+  }
+
+  /* each kind of weather fades in for a third of the loop, then waits for the other two */
+  .wx {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    animation: wx-phase var(--cycle) linear infinite;
+  }
+  .wx--wind {
+    animation-delay: calc(var(--cycle) / 3);
+  }
+  .wx--rain {
+    animation-delay: calc(var(--cycle) * 2 / 3);
+  }
+  @keyframes wx-phase {
+    0% {
+      opacity: 0;
+    }
+    4%,
+    29% {
+      opacity: 1;
+    }
+    33.3%,
+    100% {
+      opacity: 0;
+    }
+  }
+
+  /* ---------- sunshine ---------- */
+  /* a round pool of warm light centred on the sun. It is a circle that fades to nothing
+     before its own edge, so no box outline can ever show. */
+  .glow {
+    position: absolute;
+    left: 12.5%;
+    top: 14.3%;
+    width: 84%;
+    aspect-ratio: 1;
+    margin: -42% 0 0 -42%;
+    border-radius: 50%;
+    background: radial-gradient(
+      closest-side,
+      rgb(255 214 74 / 0.55) 0%,
+      rgb(255 214 74 / 0.3) 32%,
+      rgb(255 214 74 / 0.1) 66%,
+      rgb(255 214 74 / 0) 100%
+    );
+    animation: wx-breathe 4.5s ease-in-out infinite;
+  }
+  .sun {
+    position: absolute;
+    left: 4%;
+    top: 3%;
+    width: 17%;
+    aspect-ratio: 1;
+  }
+  /* rays */
+  .sun::before {
+    content: '';
+    position: absolute;
+    inset: -62%;
+    border-radius: 50%;
+    background: repeating-conic-gradient(from 0deg, rgb(255 196 0 / 0.75) 0deg 7deg, transparent 7deg 30deg);
+    -webkit-mask-image: radial-gradient(circle, transparent 30%, #000 33%, #000 46%, transparent 68%);
+    mask-image: radial-gradient(circle, transparent 30%, #000 33%, #000 46%, transparent 68%);
+    animation: wx-spin 36s linear infinite;
+  }
+  /* disc */
+  .sun::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 36% 34%, #fff1a8 0%, #ffd23f 42%, #ffb000 100%);
+    box-shadow:
+      0 0 0 6px rgb(255 214 74 / 0.28),
+      0 0 46px 14px rgb(255 196 0 / 0.5);
+    animation: wx-pulse 4.5s ease-in-out infinite;
+  }
+  @keyframes wx-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @keyframes wx-pulse {
+    50% {
+      transform: scale(1.06);
+    }
+  }
+  @keyframes wx-breathe {
+    50% {
+      opacity: 0.7;
+    }
+  }
+
+  /* ---------- wind ---------- */
+  .gusts {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    filter: drop-shadow(0 0 2px rgb(11 92 255 / 0.35));
+  }
+  .gusts path {
+    fill: none;
+    stroke: #fff;
+    stroke-width: 3.2;
+    stroke-linecap: round;
+    vector-effect: non-scaling-stroke;
+    stroke-dasharray: 110 390;
+    stroke-dashoffset: 110;
+    animation: wx-gust 2.8s cubic-bezier(0.4, 0, 0.3, 1) infinite;
+  }
+  .gusts path:nth-child(2) {
+    animation-delay: 0.7s;
+    stroke-dasharray: 150 350;
+  }
+  .gusts path:nth-child(3) {
+    animation-delay: 1.3s;
+  }
+  .gusts path:nth-child(4) {
+    animation-delay: 1.9s;
+    stroke-width: 2.4;
+  }
+  @keyframes wx-gust {
+    from {
+      stroke-dashoffset: 110;
+    }
+    to {
+      stroke-dashoffset: -500;
+    }
+  }
+  .leaf {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3.2%;
+    aspect-ratio: 1.7;
+    border-radius: 0 100% 0 100%;
+    background: linear-gradient(135deg, #7ddc4a, #27a844);
+    animation: wx-leaf 3.6s linear infinite;
+  }
+  .leaf--1 {
+    --y: 40cqh;
+    --dip: -7cqh;
+  }
+  .leaf--2 {
+    --y: 58cqh;
+    --dip: 6cqh;
+    width: 2.6%;
+    animation-duration: 4.2s;
+    animation-delay: 0.9s;
+    background: linear-gradient(135deg, #ffe066, #ffb000);
+  }
+  .leaf--3 {
+    --y: 26cqh;
+    --dip: 8cqh;
+    animation-duration: 3.9s;
+    animation-delay: 1.7s;
+  }
+  .leaf--4 {
+    --y: 70cqh;
+    --dip: -5cqh;
+    width: 2.4%;
+    animation-duration: 4.6s;
+    animation-delay: 2.5s;
+  }
+  @keyframes wx-leaf {
+    0% {
+      transform: translate(-8cqw, var(--y)) rotate(0deg);
+      opacity: 0;
+    }
+    8%,
+    90% {
+      opacity: 1;
+    }
+    50% {
+      transform: translate(50cqw, calc(var(--y) + var(--dip))) rotate(300deg);
+    }
+    100% {
+      transform: translate(108cqw, var(--y)) rotate(620deg);
+      opacity: 0;
+    }
+  }
+
+  /* ---------- rain ---------- */
+  .cloud {
+    position: absolute;
+    filter: drop-shadow(0 8px 10px rgb(60 90 140 / 0.25));
+    animation: wx-drift 9s ease-in-out infinite alternate;
+  }
+  /* one cloud each side, so the app tiles in the middle of the picture stay visible */
+  .cloud--a {
+    left: -2%;
+    top: 9%;
+    width: 36%;
+  }
+  .cloud--b {
+    left: 66%;
+    top: 0%;
+    width: 32%;
+    opacity: 0.95;
+    animation-duration: 11s;
+    animation-direction: alternate-reverse;
+  }
+  @keyframes wx-drift {
+    from {
+      transform: translateX(-3%);
+    }
+    to {
+      transform: translateX(4%);
+    }
+  }
+  .drops {
+    position: absolute;
+    left: 3%;
+    top: 16%;
+    width: 94%;
+    height: 74%;
+    transform: skewX(-9deg);
+    /* one tile holds three falling streaks; sliding the tile down makes them fall */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='48' height='60'%3E%3Cg stroke='%231e6cf0' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='M8 4v13' stroke-opacity='.75'/%3E%3Cpath d='M30 24v15' stroke-opacity='.6'/%3E%3Cpath d='M19 44v11' stroke-opacity='.5'/%3E%3Cpath d='M42 10v9' stroke-opacity='.45'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: 48px 60px;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 70%, transparent 100%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 14%, #000 70%, transparent 100%);
+    animation: wx-fall 0.55s linear infinite;
+  }
+  @keyframes wx-fall {
+    to {
+      background-position: 0 60px;
+    }
+  }
+
+  /* no moving weather for people who ask for less motion */
+  @media (prefers-reduced-motion: reduce) {
+    .weather {
+      display: none;
+    }
+  }
+</style>

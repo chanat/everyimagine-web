@@ -1,0 +1,41 @@
+---
+import Base from '../layouts/Base.astro';
+import { type Lang, href, t } from '../i18n';
+
+interface Props {
+  lang: Lang;
+}
+const { lang } = Astro.props;
+---
+
+<Base lang={lang} path="/404" title={t(lang, '404.title')} description={t(lang, '404.body')} noindex>
+  <section class="nf wrap">
+    <p class="nf__code spark-text" aria-hidden="true">404</p>
+    <h1>{t(lang, '404.title')}</h1>
+    <p class="lead">{t(lang, '404.body')}</p>
+    <a class="btn btn--primary" href={href(lang, '/')}>{t(lang, '404.home')}</a>
+  </section>
+</Base>
+
+<style>
+  .nf {
+    display: grid;
+    justify-items: center;
+    gap: 18px;
+    padding-block: clamp(64px, 12vw, 140px);
+    text-align: center;
+  }
+  .nf__code {
+    font-family: var(--font-display);
+    font-size: clamp(5rem, 20vw, 11rem);
+    font-weight: 800;
+    letter-spacing: -0.06em;
+    line-height: 1;
+  }
+  h1 {
+    font-size: clamp(1.8rem, 4.4vw, 2.8rem);
+  }
+  .btn {
+    margin-top: 10px;
+  }
+</style>
